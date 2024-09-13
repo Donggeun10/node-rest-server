@@ -13,12 +13,7 @@ import http from 'http';
  */
 
 //const port: number | string = normalizePort(process.env.PORT || '3000');
-let port: number;
-if (process.env.PORT){
-    port = parseInt(process.env.PORT);
-}else{
-    port = 3000;
-}
+const port = process.env.PORT || 3000;
 
 app.set('port', port);
 

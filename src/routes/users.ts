@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, {NextFunction, Request, Response} from 'express';
 
 const router = express.Router();
 
@@ -9,6 +9,9 @@ router.get('/', (req: Request, res: Response, next: NextFunction) => {
 
 router.get('/id/:id', (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json({ "id": req.params.id });
+  /* #swagger.security = [{
+        "basicAuth": []
+  }] */
 });
 
 export default router;

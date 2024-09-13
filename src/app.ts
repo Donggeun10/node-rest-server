@@ -1,5 +1,5 @@
 import createError from 'http-errors';
-import express, { Request, Response, NextFunction } from 'express';
+import express, {NextFunction, Request, Response} from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
@@ -7,7 +7,17 @@ import logger from 'morgan';
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 
+import basicAuth from 'express-basic-auth'
+
+import swaggerUi from "swagger-ui-express";
+import swaggerJsonOptions from "./config/swagger-output.json";
+
 const app = express();
+
+const auth = basicAuth({
+  users: { 'robot': 'play' },
+  unauthorizedResponse: getUnauthorizedResponse,
+})
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -20,7 +30,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/users', auth, usersRouter);
+app.use("/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerJsonOptions),
+);
+
 
 // catch 404 and forward to error handler
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -37,6 +52,12 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.status(err.status || 500);
   res.render('error');
 });
+
+function getUnauthorizedResponse(req : any) {
+  return req.auth
+      ? ('Credentials ' + req.auth.user + ':' + req.auth.password + ' rejected')
+      : 'No credentials provided'
+}
 
 export default app;
 
