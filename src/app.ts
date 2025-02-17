@@ -6,6 +6,7 @@ import logger from 'morgan';
 
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
+import scoreRouter from './routes/scoreController'
 
 import basicAuth from 'express-basic-auth'
 
@@ -31,6 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', auth, usersRouter);
+app.use('/score', scoreRouter);
 app.use("/api-docs",
     swaggerUi.serve,
     swaggerUi.setup(swaggerJsonOptions),
@@ -43,7 +45,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // error handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) : void => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

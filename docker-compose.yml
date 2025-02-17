@@ -1,0 +1,26 @@
+name: tennis-rest-service
+services:
+    webapp:
+        image: node-api-webapp:local
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        ports:
+            - "3000:3000"
+        deploy:
+            resources:
+                reservations:
+                    cpus: 1
+                    memory: 1024m
+    redis:
+        image: redis:local
+        build:
+            context: ./
+            dockerfile: Dockerfile_redis
+        ports:
+            - "7379:6379"
+        deploy:
+            resources:
+                reservations:
+                    cpus: 1
+                    memory: 1024m

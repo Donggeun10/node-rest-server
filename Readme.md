@@ -24,5 +24,6 @@ npm i --save-dev @types/swagger-ui-express
 ```
 
 ```
-npm run build && docker build -t node-api:local . && docker run -p 3000:3000 node-api:local
+docker-compose build --no-cache
+docker build -t node-api:local . && docker run -p 3000:3000 node-api:local
 ```
