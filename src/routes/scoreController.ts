@@ -21,6 +21,10 @@ router.post('/redis/:key', (req: Request, res: Response, next: NextFunction) => 
     scoreManagerService.setScore(key, body);
 
     res.status(201);
+    /*  #swagger.parameters['body'] = {
+        in: 'body',
+        description: 'Some description...'
+} */
 });
 
 /* GET Sqlite Test Page */
@@ -42,7 +46,14 @@ router.post('/sqlite/:id', async (req: Request, res: Response, next: NextFunctio
     scoreManagerService.saveScore(id, body);
 
     res.status(201);
-
+    /*  #swagger.parameters['body'] = {
+            in: 'body',
+            description: 'Some description...'
+        }
+        #swagger.security = [{
+        "basicAuth": []
+        }]
+    */
 });
 
 export default router;

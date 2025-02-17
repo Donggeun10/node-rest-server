@@ -54,4 +54,4 @@ const doc = {
 const outputFile = path.resolve(__dirname, "swagger-output.json");
 const endpointsFiles = ['src/app.ts'];
 
-swaggerAutogen()("outputFile", endpointsFiles, doc);
+swaggerAutogen()(outputFile, endpointsFiles, doc);
