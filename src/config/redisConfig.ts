@@ -5,11 +5,14 @@ class RedisClient {
     private redisClient: any;
 
     constructor () {
+        const redisHost = process.env.REDIS_HOST || "localhost";
+        const redisPort = process.env.REDIS_PORT || 7379;
+
         // Redis 클라이언트 생성
         this.redisClient = createClient({
             socket: {
-                host: 'localhost',
-                port: 7379,
+                host: redisHost,
+                port: Number(redisPort),
             },
         });
 
@@ -19,7 +22,7 @@ class RedisClient {
         })();
 
         this.redisClient.on('connect', () => {
-            console.log('Redis에 연결되었습니다.');
+            console.log(redisHost, redisPort, 'Redis에 연결되었습니다.');
         });
 
         this.redisClient.on('error', (err : any) => {

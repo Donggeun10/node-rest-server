@@ -17,13 +17,19 @@ COPY . .
 RUN npm run build
 
 # 실행 단계
-FROM node:lts-alpine3.21
+FROM node:lts-alpine
+
+#RUN sed 's/https/http/g' -i /etc/apk/repositories
+#RUN apk update && apk --no-cache add sqlite-dev
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
 WORKDIR /home/appuser
 # 작업 디렉토리 설정
+
+ENV REDIS_HOST=redis
+ENV REDIS_PORT=6379
 
 # 의존성 파일 복사
 COPY --chown=appuser package*.json ./

@@ -5,7 +5,7 @@
     "description": "This is a simple CRUD API application made with Express and documented with Swagger",
     "version": "1.0.0"
   },
-  "host": "localhost:3000",
+  "host": "",
   "basePath": "/",
   "schemes": [
     "http"
@@ -92,8 +92,16 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
           }
-        }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
       },
       "post": {
         "description": "",
@@ -118,7 +126,12 @@
           "201": {
             "description": "Created"
           }
-        }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
       }
     },
     "/score/sqlite/{id}": {
@@ -136,7 +149,12 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
       },
       "post": {
         "description": "",

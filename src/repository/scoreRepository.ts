@@ -1,5 +1,5 @@
-import SqliteClient from '../config/sqliteConfig';
-import sqlite3 from 'sqlite3';
+// import SqliteClient from '../config/sqliteConfig';
+// import sqlite3 from 'sqlite3';
 import RedisClient from '../config/redisConfig';
 
 class ScoreRepository {
@@ -9,7 +9,7 @@ class ScoreRepository {
 
     constructor() {
         // SQLite 데이터베이스 파일 생성 또는 연결
-        this.sqliteClient = new SqliteClient().getInstance();
+        // this.sqliteClient = new SqliteClient().getInstance();
         this.redisClient = new RedisClient().getInstance();
     }
 
@@ -27,11 +27,11 @@ class ScoreRepository {
     saveScoreData(gameId: string, scoreData: string): void {
         console.log('gameId:', gameId, 'scoreData:', scoreData);
 
-        const stmt = this.sqliteClient.prepare('INSERT INTO tb_score (game_id, score) VALUES (?, ?)  ON CONFLICT(game_id) DO UPDATE SET score = ? ');
-        stmt.run(gameId, scoreData, scoreData, function (this: sqlite3.RunResult) {
-            console.log(`새로운 사용자 생성됨: ${this.lastID}`);
-        });
-        stmt.finalize();
+        // const stmt = this.sqliteClient.prepare('INSERT INTO tb_score (game_id, score) VALUES (?, ?)  ON CONFLICT(game_id) DO UPDATE SET score = ? ');
+        // stmt.run(gameId, scoreData, scoreData, function (this: sqlite3.RunResult) {
+        //     console.log(`새로운 사용자 생성됨: ${this.lastID}`);
+        // });
+        // stmt.finalize();
     }
 
     async getScoreDataByGameId(gameId: String) {

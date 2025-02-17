@@ -9,8 +9,17 @@ router.get('/redis/:key', async (req: Request, res: Response, next: NextFunction
     const key = req.params.key;
     const scoreManagerService = new ScoreManagerService();
     const value = await scoreManagerService.getScore(key);
+    if(value){
+        res.status(200).json({[key] : value});
+    }else{
+        res.status(404).json({[key] : "Not found"});
+    }
 
-    res.status(200).json({[key] : value});
+    /*
+        #swagger.security = [{
+        "basicAuth": []
+        }]
+    */
 });
 
 router.post('/redis/:key', (req: Request, res: Response, next: NextFunction) => {
@@ -24,7 +33,12 @@ router.post('/redis/:key', (req: Request, res: Response, next: NextFunction) => 
     /*  #swagger.parameters['body'] = {
         in: 'body',
         description: 'Some description...'
-} */
+
+        }
+        #swagger.security = [{
+        "basicAuth": []
+        }]
+    */
 });
 
 /* GET Sqlite Test Page */
@@ -35,6 +49,11 @@ router.get('/sqlite/:id', async (req: Request, res: Response, next: NextFunction
     const row =  await scoreManagerService.getScoreByGameId(id);
 
     res.status(200).json(row);
+    /*
+        #swagger.security = [{
+        "basicAuth": []
+        }]
+    */
 });
 
 router.post('/sqlite/:id', async (req: Request, res: Response, next: NextFunction) => {

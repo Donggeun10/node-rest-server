@@ -6,7 +6,10 @@ services:
             context: ./
             dockerfile: Dockerfile
         ports:
-            - "3000:3000"
+            - "4000:3000"
+        environment:
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
         deploy:
             resources:
                 reservations:

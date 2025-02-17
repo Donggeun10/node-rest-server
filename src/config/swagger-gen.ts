@@ -6,7 +6,7 @@ const doc = {
         title: "Express API with Swagger",
         description: "This is a simple CRUD API application made with Express and documented with Swagger",
     },
-    host: "localhost:3000",
+    host: '',
     basePath: "/",
     schemes: ['http'],
     securityDefinitions: {
