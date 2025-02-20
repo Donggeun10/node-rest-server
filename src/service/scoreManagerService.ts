@@ -13,7 +13,11 @@ class ScoreManagerService {
     }
     
     setScore(key: string, value: string) {
-        this.scoreRepository.set(key, value);
+        this.scoreRepository.setWithLock(key, value);
+    }
+
+    removeScore(key: string) {
+        this.scoreRepository.remove(key);
     }
     
     saveScore(gameId: string, scoreData: string) {
