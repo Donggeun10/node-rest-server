@@ -1,4 +1,4 @@
-import sqlite3 from 'sqlite3';
+import Database from 'better-sqlite3';
 
 class SqliteClient {
 
@@ -6,7 +6,7 @@ class SqliteClient {
 
     constructor () {
         // SQLite 데이터베이스 파일 생성 또는 연결
-        this.dbConn = new sqlite3.Database('./my-database.db'), (err: { message: any; }) => {
+        this.dbConn = new Database('./my-database.db'), (err: { message: any; }) => {
             if (err) {
                 console.error('Failed to connect to the database:', err.message);
                 return;
