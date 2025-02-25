@@ -7,11 +7,11 @@ class ScoreManagerService {
     constructor() {
         this.scoreRepository = new ScoreRepository();
     }
-    
-    async getScore(key: string) : Promise<string> {
+
+    async getScore(key: string): Promise<string> {
         return await this.scoreRepository.get(key);
     }
-    
+
     setScore(key: string, value: string) {
         this.scoreRepository.setWithLock(key, value);
     }
@@ -19,13 +19,17 @@ class ScoreManagerService {
     removeScore(key: string) {
         this.scoreRepository.remove(key);
     }
-    
+
     saveScore(gameId: string, scoreData: string) {
         this.scoreRepository.saveScoreData(gameId, scoreData);
     }
 
-    async getScoreByGameId(gameId: String) {
+    getScoreByGameId(gameId: String) {
         return this.scoreRepository.getScoreDataByGameId(gameId);
+    }
+
+    removeScoreByGameId(gameId: String) {
+        return this.scoreRepository.removeScoreDataByGameId(gameId);
     }
 }
 

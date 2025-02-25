@@ -13,14 +13,14 @@ class ScoreRepository {
         this.redisClient = new IoRedisClient();
     }
 
-    async set(key: string, value: string)  {
-        
+    async set(key: string, value: string) {
+
         let prevValue = await this.get(key);
         prevValue = JSON.parse(prevValue);
         let newValue = JSON.parse(value);
-        if(Array.isArray(prevValue)){
-           prevValue.push(newValue[0]);
-        }else{
+        if (Array.isArray(prevValue)) {
+            prevValue.push(newValue[0]);
+        } else {
             prevValue = newValue;
         }
 
@@ -28,9 +28,9 @@ class ScoreRepository {
         console.log('key:', key, 'value:', prevValue);
     }
 
-    async setWithLock(key: string, value: string)  {
+    async setWithLock(key: string, value: string) {
 
-        this.redisClient.setLockKey(key+'_lock');
+        this.redisClient.setLockKey(key + '_lock');
         const lockAcquired = await this.redisClient.acquireLock();
         if (!lockAcquired) {
             console.log('다른 프로세스가 자원을 사용 중입니다.');
@@ -44,9 +44,9 @@ class ScoreRepository {
             let prevValue = await this.redisClient.get(key);
             prevValue = JSON.parse(prevValue);
             let newValue = JSON.parse(value);
-            if(Array.isArray(prevValue)){
+            if (Array.isArray(prevValue)) {
                 prevValue.push(newValue[0]);
-            }else{
+            } else {
                 prevValue = newValue;
             }
 
@@ -61,7 +61,7 @@ class ScoreRepository {
 
     }
 
-    async get(key: string) : Promise<string> {
+    async get(key: string): Promise<string> {
         return this.redisClient.get(key);
     }
 
@@ -69,34 +69,41 @@ class ScoreRepository {
         this.redisClient.delete(key);
     }
 
-    saveScoreData(gameId: string, scoreData: string): void {
-        console.log('gameId:', gameId, 'scoreData:', scoreData);
+    saveScoreData(gameId: string, scoreData: string) {
 
-        const stmt = this.sqliteClient.prepare('INSERT INTO tb_score (game_id, score) VALUES (?, ?)  ON CONFLICT(game_id) DO UPDATE SET score = ? ');
-        stmt.run(gameId, scoreData, scoreData, function (this: sqlite3.RunResult) {
-            console.log(`새로운 사용자 생성됨: ${this.lastInsertRowid}`);
+        const scoreDataJson = JSON.parse(scoreData);
+        console.log('gameId:', gameId, 'scoreData:', scoreDataJson);
+
+        const upsert = this.sqliteClient.transaction((input: any) => {
+            const in_gameId = input["game_id"];
+            const in_score = JSON.parse(input["score"]);
+            let row = this.sqliteClient.prepare('SELECT game_id, score FROM tb_score WHERE game_id = ? ').get(in_gameId);
+            if (row) {
+                const rowScore = JSON.parse(row.score);
+                rowScore.push(in_score[0]);
+                row.score = JSON.stringify(rowScore);
+            } else {
+                row = input;
+            }
+
+            const insert = this.sqliteClient.prepare('INSERT INTO tb_score (game_id, score) VALUES (@game_id, @score)  ON CONFLICT(game_id) DO UPDATE SET score = @score ');
+            insert.run(row);
         });
-        stmt.finalize();
+
+        try {
+            upsert.exclusive({game_id: gameId, score: scoreData});
+        } catch (error) {
+            console.error('데이터 처리 중 오류 발생:', error);
+            throw error;
+        }
     }
 
-    async getScoreDataByGameId(gameId: String) {
-        return new Promise((resolve, reject) => {
-            // SELECT 쿼리 실행
-            this.sqliteClient.all('SELECT * FROM tb_score WHERE game_id = ? ', gameId, (err: any, rows: any) => {
-                if (err) {
-                    console.error(err.message);
-                    reject(err);
-                } else {
-                    // 결과 처리
-                    rows.forEach((row: any) => {
-                        console.log(row);
-                    });
-                    resolve(rows);
-                }
+    getScoreDataByGameId(gameId: String) {
+        return this.sqliteClient.prepare('SELECT * FROM tb_score WHERE game_id = ?').get(gameId);
+    }
 
-            });
-
-        });
+    removeScoreDataByGameId(gameId: String) {
+        return this.sqliteClient.prepare('DELETE FROM tb_score WHERE game_id = ?').run(gameId);
     }
 }
 

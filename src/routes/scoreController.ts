@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, {Request, Response, NextFunction} from 'express';
 import ScoreManagerService from '../service/scoreManagerService';
 
 const router = express.Router();
@@ -10,10 +10,10 @@ router.get('/redis/:key', async (req: Request, res: Response, next: NextFunction
     const key = req.params.key;
     const value = await scoreManagerService.getScore(key);
 
-    if(value){
-        res.status(200).json({[key] : value});
-    }else{
-        res.status(404).json({[key] : "Not found"});
+    if (value) {
+        res.status(200).json({[key]: value});
+    } else {
+        res.status(404).json({[key]: "Not found"});
     }
 
     /*
@@ -63,8 +63,8 @@ router.post('/redis/:key/lock', (req: Request, res: Response, next: NextFunction
 
 router.delete('/redis/:key', (req: Request, res: Response, next: NextFunction) => {
 
-    const key = req.params.key;    
-    
+    const key = req.params.key;
+
     scoreManagerService.removeScore(key);
 
     res.status(200).send();
@@ -79,9 +79,27 @@ router.delete('/redis/:key', (req: Request, res: Response, next: NextFunction) =
 router.get('/sqlite/:id', async (req: Request, res: Response, next: NextFunction) => {
 
     const id = req.params.id;
-    const row =  await scoreManagerService.getScoreByGameId(id);
+    const row = scoreManagerService.getScoreByGameId(id);
+    console.log('row:', row);
+    if (row === undefined) {
+        res.status(404).json({[id]: "Not found"});
+    } else {
+        res.status(200).json(row);
+    }
+    /*
+        #swagger.security = [{
+        "basicAuth": []
+        }]
+    */
+});
 
-    res.status(200).json(row);
+/* DELETE Sqlite Test Page */
+router.delete('/sqlite/:id', async (req: Request, res: Response, next: NextFunction) => {
+
+    const id = req.params.id;
+    scoreManagerService.removeScoreByGameId(id);
+
+    res.status(200).send();
     /*
         #swagger.security = [{
         "basicAuth": []
