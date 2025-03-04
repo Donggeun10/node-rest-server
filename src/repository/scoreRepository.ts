@@ -46,7 +46,8 @@ class ScoreRepository {
             if (Array.isArray(prevValue)) {
                 prevValue.push(newValue);
             } else {
-                prevValue = newValue;
+                prevValue = [];
+                prevValue.push(newValue);
             }
 
             this.redisClient.set(key, JSON.stringify(prevValue));

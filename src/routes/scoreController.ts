@@ -61,13 +61,18 @@ router.post('/redis/:key/lock', (req: Request, res: Response, next: NextFunction
     */
 });
 
-router.delete('/redis/:key', (req: Request, res: Response, next: NextFunction) => {
+router.delete('/redis/:key', async (req: Request, res: Response, next: NextFunction) => {
 
     const key = req.params.key;
+    const value = await scoreManagerService.getScore(key);
 
-    scoreManagerService.removeScore(key);
+    if (value) {
+        scoreManagerService.removeScore(key);
+        res.status(200).send();
+    } else {
+        res.status(404).json({[key]: "Not found"});
+    }
 
-    res.status(200).send();
     /*
         #swagger.security = [{
         "basicAuth": []
