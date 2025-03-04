@@ -6,7 +6,7 @@ class IoRedisClient {
 
     constructor () {
         const redisHost = process.env.REDIS_HOST || "localhost";
-        const redisPort = process.env.REDIS_PORT || 7379;
+        const redisPort = process.env.REDIS_PORT || 8379;
 
         // Redis 클라이언트 생성
         this.redisClient = new Redis({

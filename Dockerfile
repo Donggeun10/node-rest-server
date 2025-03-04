@@ -65,7 +65,7 @@ USER appuser
 WORKDIR /home/appuser
 
 ENV REDIS_HOST=172.27.6.8
-ENV REDIS_PORT=7379
+ENV REDIS_PORT=8379
 
 # 의존성 파일 복사
 COPY --chown=appuser package*.json ./

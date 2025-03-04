@@ -1,5 +1,4 @@
 import SqliteClient from '../config/sqliteConfig';
-import sqlite3 from 'better-sqlite3';
 import IoRedisClient from '../config/ioRedisConfig';
 
 class ScoreRepository {
@@ -39,13 +38,13 @@ class ScoreRepository {
 
         try {
             // 데이터 조회 및 갱신 작업 수행
-            console.log('데이터를 처리 중입니다...');
+            console.log('데이터를 처리 중입니다...', value);
 
             let prevValue = await this.redisClient.get(key);
             prevValue = JSON.parse(prevValue);
             let newValue = JSON.parse(value);
             if (Array.isArray(prevValue)) {
-                prevValue.push(newValue[0]);
+                prevValue.push(newValue);
             } else {
                 prevValue = newValue;
             }
