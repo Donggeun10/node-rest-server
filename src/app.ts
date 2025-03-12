@@ -32,7 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', auth, usersRouter);
-app.use('/score', auth, scoreRouter);
+app.use('/v1/score', auth, scoreRouter);
 app.use("/api-docs",
     swaggerUi.serve,
     swaggerUi.setup(swaggerJsonOptions),
