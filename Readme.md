@@ -4,7 +4,7 @@ The frontend and backend are connected through the API. In order to test the API
 Received Data is stored in the Redis Cache or SQLite3 local database.
 
 ## 2. Architecture
-<img src="img.png" width="700">
+<img src="img_1.png" width="700">
 
 ## 3. Frameworks and Libraries
 ```
