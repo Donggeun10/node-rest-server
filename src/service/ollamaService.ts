@@ -1,13 +1,16 @@
 import {Ollama} from 'ollama'
-import {MultiModalData} from '../domain/Domains';
+import {MultiModalData, MultiModalTrainData} from '../domain/Domains';
 import * as fs from "node:fs";
+import trainDataRepository from '../repository/trainDataRepository';
 
 class OllamaService {
 
     private invalidAnswer = ["\r\n", "\n"];
     private ollama = new Ollama({host: 'http://172.27.6.8:11435'})
-    
+    private trainDataRepository
+
     constructor() {
+        this.trainDataRepository = new trainDataRepository();
     }
 
     async generate(uuid: string, model: string, system : string , prompt : string, image : string) {
@@ -62,6 +65,16 @@ class OllamaService {
             }
         }
         return answer;
+    }
+
+    addTrainData(trainId: string, data: MultiModalTrainData) {
+
+        this.trainDataRepository.setWithLock(trainId, JSON.stringify(data.toJson()));
+    }
+
+    getTrainData(trainId: string) {
+
+        return this.trainDataRepository.get(trainId);
     }
 
 }

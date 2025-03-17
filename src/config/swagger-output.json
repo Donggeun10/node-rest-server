@@ -311,6 +311,125 @@
           }
         ]
       }
+    },
+    "/v1/train/multi-modal/{uuid}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "example": "any"
+                },
+                "system": {
+                  "example": "any"
+                },
+                "prompt": {
+                  "example": "any"
+                },
+                "image": {
+                  "example": "any"
+                }
+              }
+            },
+            "description": "Some description..."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/train/multi-modal/{trainId}/train-data/{uuid}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "trainId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "response": {
+                  "example": "any"
+                },
+                "instruction": {
+                  "example": "any"
+                },
+                "image": {
+                  "example": "any"
+                }
+              }
+            },
+            "description": "Some description..."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/train/multi-modal/{trainId}/train-data": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "trainId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
     }
   },
   "definitions": {

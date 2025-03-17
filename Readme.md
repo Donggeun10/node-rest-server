@@ -18,6 +18,7 @@ Received Data is stored in the Redis Cache or SQLite3 local database.
 ## 4. Docker container creation and execution command
 ```
 docker-compose build --no-cache
+docker-compose build webapp
 docker build -t node-api:local . && docker run -p 5000:3000 node-api:local
 ```
 

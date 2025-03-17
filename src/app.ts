@@ -8,6 +8,7 @@ import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 import scoreRouter from './routes/scoreController'
 import ollamaRouter from './routes/ollamaController'
+import trainRouter from './routes/TrainDataController'
 
 import basicAuth from 'express-basic-auth'
 
@@ -35,6 +36,7 @@ app.use('/', indexRouter);
 app.use('/users', auth, usersRouter);
 app.use('/v1/score', auth, scoreRouter);
 app.use('/v1/ollama', auth, ollamaRouter);
+app.use('/v1/train', auth, trainRouter);
 app.use("/api-docs",
     swaggerUi.serve,
     swaggerUi.setup(swaggerJsonOptions),
