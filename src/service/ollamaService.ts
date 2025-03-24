@@ -82,15 +82,16 @@ class OllamaService {
         const values = await this.trainDataRepository.get(trainId);
         const datas = JSON.parse(values);
         const result = []
-        await this.makeFolder(`${__dirname}/../public/images/${trainId}`);
+        this.makeFolder(`${__dirname}/../public/images/${trainId}`);
+        this.makeFolder(`${__dirname}/../public/images/${trainId}/images`);
         for (const data of datas) {
             Object.setPrototypeOf(data, MultiModalTrainData.prototype);
             console.log(data.instruction, data.response);
             const uuid = data.instructionId;
             const image = data.image;
-            const imagePath = `${__dirname}/../public/images/${trainId}/${uuid}.jpg`;
+            const imagePath = `${__dirname}/../public/images/${trainId}/images/${uuid}.jpg`;
             this.saveBase64Image(image, imagePath);
-            data.image = `images/${trainId}/${uuid}.jpg`;
+            data.image = `images/${trainId}/images/${uuid}.jpg`;
             result.push(data.toJson());
         }
 
@@ -101,34 +102,26 @@ class OllamaService {
             return value;
         })
         console.log(allData)
-        return this.makeJsonTrainDataFile(`${__dirname}/../public/images/${trainId}.json`, allData);
+        return this.makeJsonTrainDataFile(`${__dirname}/../public/images/${trainId}/${trainId}.json`, allData);
     }
 
     makeJsonTrainDataFile(filePath: string, jsonString: string) {
         fs.writeFileSync(filePath, jsonString, 'utf8');
-        return true
     }
 
-    async makeFolder(folder: string) {
+    makeFolder(folder: string) {
+        //폴더 삭제
         try {
+            if(fs.existsSync(folder)){
+                fs.rmSync(folder, {recursive : true});
+            }
+        } catch (err) {
+            console.error('에러 발생:', err);
+        }
 
-            // 폴더 삭제
-            // fs.rmdir(folder, (err) => {
-            //     if (err) {
-            //         return console.error('폴더 삭제 실패:', err);
-            //     }
-            //     console.log('폴더 삭제 완료');
-            // });
-
+        try {
             // 폴더 생성
-            fs.mkdir(folder, (err) => {
-                if (err) {
-                    return console.error('폴더 생성 실패:', err);
-                }
-                console.log('폴더 생성 완료');
-            });
-
-
+            fs.mkdirSync(folder);
         } catch (err) {
             console.error('에러 발생:', err);
         }
@@ -142,11 +135,10 @@ class OllamaService {
         const values = await this.trainDataRepository.get(trainId);
         const datas = JSON.parse(values);
         const result: string[] = []
-        await this.makeFolder(`${__dirname}/../public/images/${trainId}`);
+        this.makeFolder(`${__dirname}/../public/images/${trainId}`);
+        this.makeFolder(`${__dirname}/../public/images/${trainId}/images`);
         for (const data of datas) {
             Object.setPrototypeOf(data, MultiModalTrainData.prototype);
-            console.log(data.instruction, data.response);
-
             const subSet = new MLLMData();
 
             const _user_messages = new Message();
@@ -161,14 +153,14 @@ class OllamaService {
 
             const uuid = data.instructionId;
             const image = data.image;
-            const imagePath = `${__dirname}/../public/images/${trainId}/${uuid}.jpg`;
+            const imagePath = `${__dirname}/../public/images/${trainId}/images/${uuid}.jpg`;
             this.saveBase64Image(image, imagePath);
-            subSet.images = `${trainId}/${uuid}.jpg`;
+            subSet.images = `images/${uuid}.jpg`;
 
             result.push(subSet.toJson());
         }
 
-        return this.makeJsonTrainDataFile(`${__dirname}/../public/images/${trainId}.json`, JSON.stringify(result));
+        return this.makeJsonTrainDataFile(`${__dirname}/../public/images/${trainId}/${trainId}.json`, JSON.stringify(result));
     }
 
 }
