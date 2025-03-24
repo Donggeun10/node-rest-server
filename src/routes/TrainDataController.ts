@@ -72,4 +72,23 @@ router.get('/multi-modal/:trainId/train-data', async (req: Request, res: Respons
     */
 });
 
+router.post('/multi-modal/:trainId/train-data', async (req: Request, res: Response, next: NextFunction) => {
+
+    const trainId = req.params.trainId;
+    const dataSet = req.query.dataSet as string;
+    if(dataSet === 'MLLM'){
+        ollamaService.generateMLLMTrainData(trainId);
+    }else {
+        ollamaService.generateTrainData(trainId);
+    }
+
+    res.status(201).json(trainId);
+
+    /*  
+        #swagger.security = [{
+        "basicAuth": []
+        }]
+    */
+});
+
 export default router;

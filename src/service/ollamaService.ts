@@ -1,5 +1,5 @@
 import {Ollama} from 'ollama'
-import {MultiModalData, MultiModalTrainData} from '../domain/Domains';
+import {MultiModalData, MultiModalTrainData, MLLMData, Message} from '../domain/Domains';
 import * as fs from "node:fs";
 import trainDataRepository from '../repository/trainDataRepository';
 
@@ -13,11 +13,11 @@ class OllamaService {
         this.trainDataRepository = new trainDataRepository();
     }
 
-    async generate(uuid: string, model: string, system : string , prompt : string, image : string) {
+    async generate(uuid: string, model: string, system: string, prompt: string, image: string) {
 
         const imagePath = `${__dirname}/../public/images/${uuid}.jpg`;
         this.saveBase64Image(image, imagePath);
-        
+
         const options = {
             temperature: 0.5,
         }
@@ -35,15 +35,15 @@ class OllamaService {
             answer = answer.concat(part.response);
             console.log(answer);
         }
-        
+
         return answer;
     }
 
     saveBase64Image(base64String: string, outputFilePath: string): void {
         // 만약 Base64 문자열이 "data:image/jpeg;base64," 형태라면, 접두사를 제거합니다.
-        if(fs.existsSync(outputFilePath)){
+        if (fs.existsSync(outputFilePath)) {
             console.log(`이미 저장된 파일입니다.: ${outputFilePath}`);
-        }else {
+        } else {
             const cleanedBase64 = base64String.replace(/^data:image\/\w+;base64,/, '');
             const imageBuffer = Buffer.from(cleanedBase64, 'base64');
             fs.writeFileSync(outputFilePath, imageBuffer);
@@ -54,7 +54,7 @@ class OllamaService {
     async generateWithRetry(uuid: string, data: MultiModalData, retryCount: number) {
 
         let answer = "";
-        while(retryCount > 0) {
+        while (retryCount > 0) {
             answer = await this.generate(uuid, data.model, data.system, data.prompt, data.image);
             if (this.invalidAnswer.filter(invalid => answer === invalid).length > 0 && retryCount > 0) {
                 console.log(`재시도: ${retryCount}, 응답: ${answer}`);
@@ -75,6 +75,100 @@ class OllamaService {
     getTrainData(trainId: string) {
 
         return this.trainDataRepository.get(trainId);
+    }
+
+    async generateTrainData(trainId: string) {
+
+        const values = await this.trainDataRepository.get(trainId);
+        const datas = JSON.parse(values);
+        const result = []
+        await this.makeFolder(`${__dirname}/../public/images/${trainId}`);
+        for (const data of datas) {
+            Object.setPrototypeOf(data, MultiModalTrainData.prototype);
+            console.log(data.instruction, data.response);
+            const uuid = data.instructionId;
+            const image = data.image;
+            const imagePath = `${__dirname}/../public/images/${trainId}/${uuid}.jpg`;
+            this.saveBase64Image(image, imagePath);
+            data.image = `images/${trainId}/${uuid}.jpg`;
+            result.push(data.toJson());
+        }
+
+        const allData = JSON.stringify(result, (key, value) => {
+            if (key === 'instructionId') {
+                return undefined; // 'instructionId' 키를 제외
+            }
+            return value;
+        })
+        console.log(allData)
+        return this.makeJsonTrainDataFile(`${__dirname}/../public/images/${trainId}.json`, allData);
+    }
+
+    makeJsonTrainDataFile(filePath: string, jsonString: string) {
+        fs.writeFileSync(filePath, jsonString, 'utf8');
+        return true
+    }
+
+    async makeFolder(folder: string) {
+        try {
+
+            // 폴더 삭제
+            // fs.rmdir(folder, (err) => {
+            //     if (err) {
+            //         return console.error('폴더 삭제 실패:', err);
+            //     }
+            //     console.log('폴더 삭제 완료');
+            // });
+
+            // 폴더 생성
+            fs.mkdir(folder, (err) => {
+                if (err) {
+                    return console.error('폴더 생성 실패:', err);
+                }
+                console.log('폴더 생성 완료');
+            });
+
+
+        } catch (err) {
+            console.error('에러 발생:', err);
+        }
+    }
+
+    async generateMLLMTrainData(trainId: string) {
+        const userRole: string = "user";
+        const imageTag: string = "<image>";
+        const assistantRole: string = "assistant";
+
+        const values = await this.trainDataRepository.get(trainId);
+        const datas = JSON.parse(values);
+        const result: string[] = []
+        await this.makeFolder(`${__dirname}/../public/images/${trainId}`);
+        for (const data of datas) {
+            Object.setPrototypeOf(data, MultiModalTrainData.prototype);
+            console.log(data.instruction, data.response);
+
+            const subSet = new MLLMData();
+
+            const _user_messages = new Message();
+            _user_messages.content = imageTag + data.instruction
+            _user_messages.role = userRole;
+            subSet.messages = _user_messages;
+
+            const _assistant_messages = new Message();
+            _assistant_messages.content = data.response
+            _assistant_messages.role = assistantRole;
+            subSet.messages = _assistant_messages;
+
+            const uuid = data.instructionId;
+            const image = data.image;
+            const imagePath = `${__dirname}/../public/images/${trainId}/${uuid}.jpg`;
+            this.saveBase64Image(image, imagePath);
+            subSet.images = `${trainId}/${uuid}.jpg`;
+
+            result.push(subSet.toJson());
+        }
+
+        return this.makeJsonTrainDataFile(`${__dirname}/../public/images/${trainId}.json`, JSON.stringify(result));
     }
 
 }
